@@ -23,16 +23,16 @@ public class TextFileMerger {
     public static void main(String[] args) {
         TextFileMerger merger = new TextFileMerger();
 
-        // 1. sourceDir: 需要扫描的源文件根目录
+        // TODO: 1. sourceDir: 需要扫描的源文件根目录
         String sourceDir = "/home/lbs/tmp/text_source";
 
-        // 2. targetDir: 合并后文件的存放目录
+        // TODO: 2. targetDir: 合并后文件的存放目录
         String targetDir = "/home/lbs/tmp/text_target";
 
-        // 3. outputFileName: 合并后的文件名称
+        // TODO: 3. outputFileName: 合并后的文件名称
         String outputFileName = "merged_resources.txt";
 
-        // 演示：同时合并 Java文件, Markdown文档, XML配置, 和普通文本
+        // TODO: 同时合并 Java文件, Markdown文档, XML配置, 和普通文本
         merger.mergeFiles(sourceDir, targetDir, outputFileName,
                 ".java",
                 ".md",
