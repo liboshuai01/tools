@@ -1,5 +1,7 @@
 package cn.liboshuai.tools.file;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -9,7 +11,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
  * 环境要求: Java 17+
  * 使用方法: 修改 SOURCE_DIR 和 TARGET_DIR 后运行 main 方法
  */
+@Slf4j
 public class WikiToHexoConverter {
 
     // TODO: 请修改为你本地的实际路径
@@ -33,7 +35,7 @@ public class WikiToHexoConverter {
         Path targetPath = Paths.get(TARGET_DIR);
 
         if (!Files.exists(sourcePath)) {
-            System.err.println("源目录不存在: " + sourcePath);
+            log.error("源目录不存在: {}", sourcePath);
             return;
         }
 
@@ -46,10 +48,10 @@ public class WikiToHexoConverter {
                         .filter(p -> p.toString().endsWith(".md"))
                         .forEach(file -> convertFile(file, targetPath));
             }
-            System.out.println("✅ 所有文件转换完成！");
+            log.info("✅ 所有文件转换完成！");
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("", e);
         }
     }
 
@@ -63,7 +65,7 @@ public class WikiToHexoConverter {
             String[] parts = content.split("---", 3);
 
             if (parts.length < 3) {
-                System.out.println("⚠️ 跳过非标准格式文件: " + sourceFile.getFileName());
+                log.info("⚠️ 跳过非标准格式文件: {}", sourceFile.getFileName());
                 return;
             }
 
@@ -105,7 +107,7 @@ public class WikiToHexoConverter {
                 // 简单处理逗号分隔
                 tagsList = Arrays.stream(tagsRaw.split(","))
                         .map(String::trim)
-                        .collect(Collectors.toList());
+                        .toList();
             }
 
             if (!tagsList.isEmpty()) {
@@ -128,7 +130,7 @@ public class WikiToHexoConverter {
             newYaml.append("---");
 
             // 4. 组合新内容
-            String newContent = newYaml.toString() + "\n" + bodyContent;
+            String newContent = newYaml + "\n" + bodyContent;
 
             // 5. 确定新文件名 (使用 Title，去除非法字符)
             String safeTitle = title.replaceAll("[\\\\/:*?\"<>|]", "_").trim(); // Windows 非法字符替换
@@ -139,10 +141,10 @@ public class WikiToHexoConverter {
 
             // 6. 写入文件
             Files.writeString(targetFile, newContent, StandardCharsets.UTF_8);
-            System.out.println("处理: " + originalFilename + " -> " + targetFile.getFileName());
+            log.info("处理: {} -> {}", originalFilename, targetFile.getFileName());
 
         } catch (IOException e) {
-            System.err.println("处理文件失败: " + sourceFile + " Error: " + e.getMessage());
+            log.error("处理文件失败: {} Error: {}", sourceFile, e.getMessage());
         }
     }
 
@@ -156,7 +158,9 @@ public class WikiToHexoConverter {
 
         for (String line : lines) {
             line = line.trim();
-            if (line.isEmpty() || line.startsWith("#")) {continue;}
+            if (line.isEmpty() || line.startsWith("#")) {
+                continue;
+            }
 
             int colonIndex = line.indexOf(':');
             if (colonIndex > 0) {
