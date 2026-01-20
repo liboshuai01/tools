@@ -23,12 +23,18 @@ public class TextFileMerger {
     public static void main(String[] args) {
         TextFileMerger merger = new TextFileMerger();
 
-        // 示例路径
-        String targetDir = "src/main/resources";
+        // 1. sourceDir: 需要扫描的源文件根目录
+        String sourceDir = "/home/lbs/tmp/text_source";
+
+        // 2. targetDir: 合并后文件的存放目录
+        String targetDir = "/home/lbs/tmp/text_target";
+
+        // 3. outputFileName: 合并后的文件名称
         String outputFileName = "merged_resources.txt";
 
-        // 演示：同时合并 Markdown文档, XML配置, 和普通文本
-        merger.mergeFiles(targetDir, outputFileName,
+        // 演示：同时合并 Java文件, Markdown文档, XML配置, 和普通文本
+        merger.mergeFiles(sourceDir, targetDir, outputFileName,
+                ".java",
                 ".md",
                 ".xml",
                 ".txt",
@@ -45,32 +51,47 @@ public class TextFileMerger {
     /**
      * 合并文件
      *
-     * @param directoryPathStr 需要扫描的根目录路径
-     * @param outputFileStr    输出文件的路径 (例如: project_context.txt)
-     * @param extensions       需要合并的文件后缀 (例如: .java, .md, .txt)
+     * @param sourceDirStr      需要扫描的源根目录路径
+     * @param targetDirStr      输出文件的目标存储目录
+     * @param outputFileNameStr 输出文件的名称 (例如: project_context.txt)
+     * @param extensions        需要合并的文件后缀 (例如: .java, .md, .txt)
      */
-    public void mergeFiles(String directoryPathStr, String outputFileStr, String... extensions) {
-        Path rootDir = Paths.get(directoryPathStr);
-        Path outputFile = Paths.get(outputFileStr);
+    public void mergeFiles(String sourceDirStr, String targetDirStr, String outputFileNameStr, String... extensions) {
+        Path sourcePath = Paths.get(sourceDirStr);
+        Path targetPath = Paths.get(targetDirStr);
+        // 拼接完整输出路径：目标目录 + 文件名
+        Path outputFile = targetPath.resolve(outputFileNameStr);
 
-        if (!Files.exists(rootDir) || !Files.isDirectory(rootDir)) {
-            log.error("目标路径不存在或不是目录: {}", directoryPathStr);
+        // 校验源目录
+        if (!Files.exists(sourcePath) || !Files.isDirectory(sourcePath)) {
+            log.error("源路径不存在或不是目录: {}", sourceDirStr);
             return;
         }
 
-        log.info("开始扫描目录: {}", directoryPathStr);
+        // 校验并创建目标目录
+        try {
+            if (!Files.exists(targetPath)) {
+                Files.createDirectories(targetPath);
+                log.info("目标目录不存在，已自动创建: {}", targetPath);
+            }
+        } catch (IOException e) {
+            log.error("无法创建目标目录: {}", targetDirStr, e);
+            return;
+        }
+
+        log.info("开始扫描源目录: {}", sourceDirStr);
 
         List<Path> targetFiles = new ArrayList<>();
 
         try {
             // 1. 扫描所有文件
-            Files.walkFileTree(rootDir, new SimpleFileVisitor<>() {
+            Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     String fileName = file.toString();
                     for (String ext : extensions) {
                         if (fileName.endsWith(ext)) {
-                            // 避免把输出文件自己也读进去了（如果输出文件也在源目录里）
+                            // 避免把输出文件自己也读进去了（如果输出文件被放在了源目录里）
                             if (!file.equals(outputFile)) {
                                 targetFiles.add(file);
                             }
@@ -82,6 +103,11 @@ public class TextFileMerger {
 
             log.info("找到 {} 个符合条件的文本文件，准备合并...", targetFiles.size());
 
+            if (targetFiles.isEmpty()) {
+                log.warn("未找到任何符合后缀要求的文件，操作结束。");
+                return;
+            }
+
             // 2. 写入合并文件
             try (BufferedWriter writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
@@ -90,10 +116,11 @@ public class TextFileMerger {
                 writer.write("CONTEXT_INFO: This file contains merged text files for analysis.\n");
                 writer.write("Please refer to the file paths below to understand the structure.\n");
                 writer.write("Total Files: " + targetFiles.size() + "\n");
+                writer.write("Source Directory: " + sourcePath.toAbsolutePath() + "\n");
 
                 for (Path path : targetFiles) {
-                    // 计算相对路径
-                    String relativePath = rootDir.relativize(path).toString();
+                    // 计算相对路径 (相对于源目录)
+                    String relativePath = sourcePath.relativize(path).toString();
                     // 统一路径分隔符，方便跨平台阅读
                     relativePath = relativePath.replace("\\", "/");
 
