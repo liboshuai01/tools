@@ -1,4 +1,4 @@
-package cn.liboshuai.tools.blog;
+package cn.liboshuai.tools.file;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
