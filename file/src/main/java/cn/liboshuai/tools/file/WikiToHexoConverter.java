@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 /**
  * Wiki.js Markdown 批量转换为 Hexo Markdown 工具
- * 使用方式：直接idea中运行，在表单中输入对应目录参数后回车确定即可
+ * 使用方式：直接idea中运行，启动后在表单中输入对应目录参数后回车确定即可
  */
 @Slf4j
 public class WikiToHexoConverter {

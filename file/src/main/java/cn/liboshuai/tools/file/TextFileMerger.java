@@ -18,7 +18,7 @@ import java.util.Map;
  * 功能：将指定目录下的多个文本文件（如代码、Markdown、配置、日志等）合并为一个带标记的大文本文件。
  * 用途：生成用于 LLM (如 Gemini/ChatGPT) 上下文分析的聚合文件，或用于文档归档。
  * </p>
- * 使用方式：直接idea中运行，在表单中输入对应目录参数后回车确定即可
+ * 使用方式：直接idea中运行，启动后在表单中输入对应目录参数后回车确定即可
  */
 @Slf4j
 public class TextFileMerger {
