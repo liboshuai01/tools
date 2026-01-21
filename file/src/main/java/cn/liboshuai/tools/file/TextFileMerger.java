@@ -26,8 +26,8 @@ public class TextFileMerger {
         TextFileMerger merger = new TextFileMerger();
 
         Map<String, String> inputs = GuiInput.askForm("文本合并工具配置",
-                new GuiInput.Item("source", "源文件目录", "~/tmp/text/source"),
-                new GuiInput.Item("target", "目标存放目录", "~/tmp/text/target"),
+                new GuiInput.Item("source", "原来的文件目录", "~/tmp/text/source"),
+                new GuiInput.Item("target", "合并后文件目录", "~/tmp/text/target"),
                 new GuiInput.Item("filename", "合并后的文件名", "code.txt")
         );
 
@@ -67,7 +67,7 @@ public class TextFileMerger {
         Path sourcePath = Paths.get(sourceDirStr);
         Path targetPath = Paths.get(targetDirStr);
         // 拼接完整输出路径：目标目录 + 文件名
-        Path outputFile = targetPath.resolve(outputFileNameStr);
+        Path outputFile = targetPath.resolve(Paths.get(outputFileNameStr).getFileName());
 
         // 校验源目录
         if (!Files.exists(sourcePath) || !Files.isDirectory(sourcePath)) {
