@@ -1,5 +1,6 @@
 package cn.liboshuai.tools.file;
 
+import cn.liboshuai.tools.file.swing.GuiInput;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -16,23 +17,28 @@ import java.util.stream.Stream;
 /**
  * Wiki.js Markdown 批量转换为 Hexo Markdown 工具
  * 环境要求: Java 17+
- * 使用方法: 修改 SOURCE_DIR 和 TARGET_DIR 后运行 main 方法
  */
 @Slf4j
 public class WikiToHexoConverter {
 
-    // TODO: 请修改为你本地的实际路径
-    private static final String SOURCE_DIR = "/home/lbs/tmp/wiki";
-    private static final String TARGET_DIR = "/home/lbs/tmp/hexo";
-
-    // 默认封面图 (如果源文件没有封面，使用此图)
-    private static final String DEFAULT_COVER = "https://lbs-images.oss-cn-shanghai.aliyuncs.com/default_cover.png";
-
     private static final DateTimeFormatter HEXO_DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static void main(String[] args) {
-        Path sourcePath = Paths.get(SOURCE_DIR);
-        Path targetPath = Paths.get(TARGET_DIR);
+
+        Map<String, String> inputs = GuiInput.askForm("文本合并工具配置",
+                new GuiInput.Item("source", "wiki文件目录", "~/tmp/blog/wiki"),
+                new GuiInput.Item("target", "hexo文件目录", "~/tmp/blog/hexo")
+        );
+
+        // 从 Map 中取出结果
+        String sourceDir = inputs.get("source");
+        String targetDir = inputs.get("target");
+
+        // 打印一下确认路径是否解析正确
+        log.info("配置确认 -> wiki文件目录: {}, hexo文件目录: {}", sourceDir, targetDir);
+
+        Path sourcePath = Paths.get(sourceDir);
+        Path targetPath = Paths.get(targetDir);
 
         if (!Files.exists(sourcePath)) {
             log.error("源目录不存在: {}", sourcePath);
@@ -120,9 +126,6 @@ public class WikiToHexoConverter {
                 newYaml.append("categories:\n");
                 newYaml.append("  - ").append(tagsList.get(0)).append("\n");
             }
-
-            // Cover (Wiki.js 通常不带 cover，这里根据你的需求尝试获取或使用默认)
-//            newYaml.append("cover: '").append(DEFAULT_COVER).append("'\n");
 
             // TOC
             newYaml.append("toc: true\n");

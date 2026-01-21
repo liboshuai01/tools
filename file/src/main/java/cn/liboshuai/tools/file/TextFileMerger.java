@@ -1,5 +1,6 @@
 package cn.liboshuai.tools.file;
 
+import cn.liboshuai.tools.file.swing.GuiInput;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;
@@ -9,6 +10,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 通用文本文件合并工具
@@ -23,16 +25,21 @@ public class TextFileMerger {
     public static void main(String[] args) {
         TextFileMerger merger = new TextFileMerger();
 
-        // TODO: 1. sourceDir: 需要扫描的源文件根目录
-        String sourceDir = "/home/lbs/tmp/text_source";
+        Map<String, String> inputs = GuiInput.askForm("文本合并工具配置",
+                new GuiInput.Item("source", "源文件目录", "~/tmp/text/source"),
+                new GuiInput.Item("target", "目标存放目录", "~/tmp/text/target"),
+                new GuiInput.Item("filename", "合并后的文件名", "code.txt")
+        );
 
-        // TODO: 2. targetDir: 合并后文件的存放目录
-        String targetDir = "/home/lbs/tmp/text_target";
+        // 从 Map 中取出结果
+        String sourceDir = inputs.get("source");
+        String targetDir = inputs.get("target");
+        String outputFileName = inputs.get("filename");
 
-        // TODO: 3. outputFileName: 合并后的文件名称
-        String outputFileName = "merged_resources.txt";
+        // 打印一下确认路径是否解析正确
+        log.info("配置确认 -> 源: {}, 目标: {}, 文件: {}", sourceDir, targetDir, outputFileName);
 
-        // TODO: 同时合并 Java文件, Markdown文档, XML配置, 和普通文本
+        // 同时合并 Java文件, Markdown文档, XML配置, 和普通文本
         merger.mergeFiles(sourceDir, targetDir, outputFileName,
                 ".java",
                 ".md",
