@@ -27,8 +27,8 @@ public class TextFileMerger {
         TextFileMerger merger = new TextFileMerger();
 
         Map<String, String> inputs = GuiInput.askForm("文本合并工具配置",
-                new GuiInput.Item("source", "原来的文件目录", "~/tmp/text/source"),
-                new GuiInput.Item("target", "合并后文件目录", "~/tmp/text/target"),
+                new GuiInput.Item("source", "原来的文件目录", "~/Tmp/text/source"),
+                new GuiInput.Item("target", "合并后文件目录", "~/Tmp/text/target"),
                 new GuiInput.Item("filename", "合并后的文件名", "code.txt")
         );
 
