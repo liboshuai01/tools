@@ -26,8 +26,8 @@ public class WikiToHexoConverter {
     public static void main(String[] args) {
 
         Map<String, String> inputs = GuiInput.askForm("wiki转hexo工具配置",
-                new GuiInput.Item("source", "wiki文件目录", "~/tmp/blog/wiki"),
-                new GuiInput.Item("target", "hexo文件目录", "~/tmp/blog/hexo")
+                new GuiInput.Item("source", "wiki文件目录", "~/Tmp/blog/wiki"),
+                new GuiInput.Item("target", "hexo文件目录", "~/Tmp/blog/hexo")
         );
 
         // 从 Map 中取出结果
